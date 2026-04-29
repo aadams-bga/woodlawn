@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Permits in Woodlawn</title>
+    <script src="https://d3js.org/d3.v7.min.js" defer></script>
+    <style>
+        #permits-graph-container {
+            font-family: "Halyard Text", "halyard-text", Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            background-color: #ffffff; 
+            color: #333333; 
+            padding-bottom: 20px;
+        }
+
+        .iap-logo {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 150px;
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #permits-graph-container h2,
+        #permits-graph-container p,
+        #permits-d3-wrapper,
+        .graph-footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        #permits-graph-container h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: #333;
+            line-height: 1.2;
+        }
+
+        #permits-graph-container p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        #permits-d3-wrapper {
+            min-height: 400px; 
+            display: block;
+        }
+
+        .graph-tooltip {
+            position: absolute;
+            text-align: left;
+            padding: 10px;
+            font-family: "Halyard Text", "halyard-text", Arial, sans-serif;
+            font-size: 13px;
+            background: white;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            pointer-events: none; 
+            opacity: 0;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        #permits-graph-container .grid line {
+            stroke: #ccc;
+            stroke-opacity: 0.5;
+            stroke-dasharray: 3, 3;
+        }
+        
+        #permits-graph-container .grid path {
+            stroke-width: 0;
+        }
+
+        .graph-footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="permits-graph-container">
+    <img src="https://raw.githubusercontent.com/aadams-bga/images/bffe8cc967881aeed4fbdee8328f4b2e056159b9/iaplogo.svg" class="iap-logo" alt="IAP Logo">
+
+    <h2>Building permit activity in Woodlawn has shifted toward new construction</h2>
+    <p>
+       While wrecking permits peaked in 2014, new construction permits have seen a significant upward trend since 2018, reaching their highest point in 2021.
+    </p>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #3b82f6;"></div>
+            <span>New construction</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #a855f7;"></div>
+            <span>Wrecking</span>
+        </div>
+    </div>
+    
+    <div id="permits-d3-wrapper"></div>
+
+    <div class="graph-footer">
+        Graph: Andrew Adams, Illinois Answers Project • Source: City of Chicago Data Portal
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const data = [
+            { year: "2008", "New construction": 17, "Wrecking": 5 },
+            { year: "2009", "New construction": 10, "Wrecking": 6 },
+            { year: "2010", "New construction": 8, "Wrecking": 13 },
+            { year: "2011", "New construction": 4, "Wrecking": 11 },
+            { year: "2012", "New construction": 6, "Wrecking": 16 },
+            { year: "2013", "New construction": 6, "Wrecking": 13 },
+            { year: "2014", "New construction": 12, "Wrecking": 22 },
+            { year: "2015", "New construction": 12, "Wrecking": 7 },
+            { year: "2016", "New construction": 19, "Wrecking": 10 },
+            { year: "2017", "New construction": 27, "Wrecking": 12 },
+            { year: "2018", "New construction": 40, "Wrecking": 15 },
+            { year: "2019", "New construction": 27, "Wrecking": 6 },
+            { year: "2020", "New construction": 49, "Wrecking": 3 },
+            { year: "2021", "New construction": 61, "Wrecking": 3 },
+            { year: "2022", "New construction": 49, "Wrecking": 3 },
+            { year: "2023", "New construction": 39, "Wrecking": 3 },
+            { year: "2024", "New construction": 38, "Wrecking": 3 },
+            { year: "2025", "New construction": 47, "Wrecking": 3 },
+            { year: "2026", "New construction": 4, "Wrecking": 0 }
+        ];
+
+        const categories = ["New construction", "Wrecking"];
+        const colors = { "New construction": "#3b82f6", "Wrecking": "#a855f7" };
+
+        const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+        const container = document.getElementById("permits-d3-wrapper");
+        const containerWidth = container.getBoundingClientRect().width || 800;
+        const width = containerWidth - margin.left - margin.right;
+        const height = 400 - margin.top - margin.bottom;
+
+        const svg = d3.select("#permits-d3-wrapper")
+            .append("svg")
+            .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+            .attr("preserveAspectRatio", "xMidYMid meet")
+            .style("width", "100%")
+            .style("height", "auto")
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const x0 = d3.scaleBand()
+            .domain(data.map(d => d.year))
+            .rangeRound([0, width])
+            .paddingInner(0.15);
+
+        const x1 = d3.scaleBand()
+            .domain(categories)
+            .rangeRound([0, x0.bandwidth()])
+            .padding(0.05);
+
+        const y = d3.scaleLinear()
+            .domain([0, d3.max(data, d => Math.max(d["New construction"], d["Wrecking"]))]).nice()
+            .rangeRound([height, 0]);
+
+        // Tooltip
+        const tooltip = d3.select("body").append("div").attr("class", "graph-tooltip");
+
+        // Gridlines
+        svg.append("g")
+            .attr("class", "grid")
+            .call(d3.axisLeft(y)
+                .ticks(5)
+                .tickSize(-width)
+                .tickFormat("")
+            )
+            .select(".domain").remove();
+
+        // X Axis
+        svg.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x0).tickSize(0).tickPadding(10))
+            .style("font-size", "12px")
+            .style("color", "#555")
+            .select(".domain").remove();
+
+        // Y Axis
+        svg.append("g")
+            .call(d3.axisLeft(y).ticks(5).tickSize(0).tickPadding(10))
+            .style("font-size", "12px")
+            .style("color", "#555")
+            .select(".domain").remove();
+
+        // Bars
+        svg.append("g")
+            .selectAll("g")
+            .data(data)
+            .join("g")
+            .attr("transform", d => `translate(${x0(d.year)},0)`)
+            .selectAll("rect")
+            .data(d => categories.map(key => ({ key, value: d[key], year: d.year })))
+            .join("rect")
+            .attr("x", d => x1(d.key))
+            .attr("y", d => y(d.value))
+            .attr("width", x1.bandwidth())
+            .attr("height", d => height - y(d.value))
+            .attr("fill", d => colors[d.key])
+            .on("mouseover", function(event, d) {
+                d3.select(this).style("opacity", 0.8);
+                tooltip.transition().duration(200).style("opacity", 1);
+                tooltip.html(`<strong>${d.year}</strong><br>${d.key}: <strong>${d.value}</strong>`);
+            })
+            .on("mousemove", function(event) {
+                tooltip
+                    .style("left", (event.pageX + 15) + "px")
+                    .style("top", (event.pageY - 28) + "px");
+            })
+            .on("mouseleave", function() {
+                d3.select(this).style("opacity", 1);
+                tooltip.transition().duration(500).style("opacity", 0);
+            });
+    });
+</script>
+
+</body>
+</html>

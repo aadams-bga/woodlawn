@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woodlawn Graphics Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .graphic-wrapper {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .graphic-wrapper h3 {
+            margin-top: 0;
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 650px; /* Adjust based on content height */
+            border: none;
+            display: block;
+        }
+
+        .note {
+            font-size: 14px;
+            color: #777;
+            font-style: italic;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Woodlawn Story Graphics Preview</h1>
+    <p>This page demonstrates how the D3 graphics will appear when embedded in a WordPress page using iframes.</p>
+
+    <!-- Permits Graph -->
+    <div class="graphic-wrapper">
+        <h3>Building Permits Graph</h3>
+        <iframe src="permits_graph.html" title="Building Permits in Woodlawn"></iframe>
+        <p class="note">Source: permits_graph.html</p>
+    </div>
+
+    <!-- House Prices Graph -->
+    <div class="graphic-wrapper">
+        <h3>House Prices Graph</h3>
+        <iframe src="house_prices_graph.html" title="House Price Trends in Woodlawn"></iframe>
+        <p class="note">Source: house_prices_graph.html</p>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px; color: #999; font-size: 12px;">
+        &copy; 2026 Illinois Answers Project
+    </div>
+
+</body>
+</html>

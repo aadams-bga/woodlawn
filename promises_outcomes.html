@@ -7,7 +7,7 @@
         --navy: #000033;
         --yellow: #FFD700;
         --white: #ffffff;
-        --gray:rgba(250,250,250)
+        --gray: #f0f0f0;
         background-color: var(--white);
         font-family: "Halyard Text", "halyard-text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         color: var(--navy);
@@ -31,7 +31,7 @@
 
     /* Left side: Program Title */
     .program-title-box {
-        flex: 1.2;
+        flex: 1.5;
         padding-left: 3%;
         z-index: 5;
     }
@@ -41,7 +41,7 @@
         font-weight: 800;
         text-transform: uppercase;
         line-height: 1.1;
-        max-width: 550px;
+        max-width: 650px;
     }
 
     /* Center: The Morphing Shape */
@@ -50,8 +50,8 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: 300px;
-        height: 300px;
+        width: 350px;
+        height: 350px;
         z-index: 1;
         display: flex;
         justify-content: center;
@@ -62,15 +62,15 @@
         width: 100%;
         height: 100%;
         background-color: var(--gray);
-        transition: background-color 0.5s ease;
+        transition: background-color 0.3s ease;
         /* Default: Solid Square */
-        clip-path: inset(0% 0% 0% 0%);
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
     }
 
     /* Right side: Content (Promise & Outcome) */
     .content-box {
-        flex: 1.5;
-        padding-right: 3%;
+        flex: 2;
+        padding-right: 5%;
         position: relative;
         height: 100%;
         display: flex;
@@ -81,7 +81,7 @@
 
     .promise-text, .outcome-text {
         position: absolute;
-        width: 95%;
+        width: 100%;
     }
 
     .label {
@@ -102,7 +102,7 @@
     .outcome-text .label { color: #d32f2f; }
 
     .main-copy {
-        font-size: clamp(18px, 2vw, 24px);
+        font-size: clamp(18px, 2.2vw, 26px);
         line-height: 1.4;
     }
 
@@ -117,21 +117,23 @@
             padding: 0 20px;
             text-align: center;
             flex: none;
+            width: 90%;
         }
         .morph-wrapper {
-            top: 40%;
-            width: 200px;
-            height: 200px;
-            opacity: 0.2; /* Fade behind text on mobile */
+            top: 45%;
+            width: 250px;
+            height: 250px;
+            opacity: 0.15; /* Fade behind text on mobile */
         }
         .content-box {
             padding: 0 20px;
             text-align: center;
             align-items: center;
             flex: 1;
+            width: 100%;
         }
         .promise-text, .outcome-text {
-            width: 90%;
+            width: 95%;
         }
     }
 </style>
@@ -196,7 +198,7 @@
             <div class="content-box">
                 <div class="promise-text">
                     <span class="label">The Promise</span>
-                    <p class="main-copy">$500,000 granted to nonproftit developer POAH to acquire and redevelop residential units in Woodlawn.</p>
+                    <p class="main-copy">$500,000 granted to nonprofit developer POAH to acquire and redevelop residential units in Woodlawn.</p>
                 </div>
                 <div class="outcome-text">
                     <span class="label">The Outcome</span>
@@ -218,7 +220,7 @@
             <div class="content-box">
                 <div class="promise-text">
                     <span class="label">The Promise</span>
-                    <p class="main-copy">$7 million dollars loan fund for local developrs to bring vacant lots and apartment buidlings back online.</p>
+                    <p class="main-copy">$7 million loan fund for local developers to bring vacant lots and apartment buildings back online.</p>
                 </div>
                 <div class="outcome-text">
                     <span class="label">The Outcome</span>
@@ -240,7 +242,7 @@
             <div class="content-box">
                 <div class="promise-text">
                     <span class="label">The Promise</span>
-                    <p class="main-copy">$1 million dollars granted to longterm homeowners in Woodlawn who need help fixing up their properties.</p>
+                    <p class="main-copy">$1 million granted to long-term homeowners in Woodlawn who need help fixing up their properties.</p>
                 </div>
                 <div class="outcome-text">
                     <span class="label">The Outcome</span>
@@ -315,17 +317,26 @@
                     end: "bottom bottom",
                     scrub: 1,
                     onUpdate: (self) => {
-                        // Dynamically change shape based on scroll
-                        // 0% scroll = Solid Square
-                        // 100% scroll = Hollow/Small Triangle (Broken)
                         const p = self.progress;
-                        const clipValue = p * 40; // Shrink effect
-                        shape.style.clipPath = `inset(${clipValue}% ${clipValue}% ${clipValue}% ${clipValue}% round ${p * 50}%)`;
+                        
+                        // Morph from solid square to a small, jagged "broken" shape
+                        // p=0: 0% 0%, 100% 0%, 100% 100%, 0% 100% (Square)
+                        // p=1: 40% 40%, 60% 30%, 70% 70%, 30% 60% (Broken shard)
+                        
+                        const inset = p * 35; 
+                        const jitter = p * 15;
+                        
+                        const p1 = `${0 + inset + (jitter * 0.5)}% ${0 + inset}%`;
+                        const p2 = `${100 - inset}% ${0 + inset + jitter}%`;
+                        const p3 = `${100 - inset - jitter}% ${100 - inset}%`;
+                        const p4 = `${0 + inset}% ${100 - inset - (jitter * 0.8)}%`;
+                        
+                        shape.style.clipPath = `polygon(${p1}, ${p2}, ${p3}, ${p4})`;
                         
                         if (p > 0.5) {
-                            shape.style.backgroundColor = "#FFD700"; // Morph color to yellow on failure
+                            shape.style.backgroundColor = "#FFD700"; // Yellow failure
                         } else {
-                            shape.style.backgroundColor = "#000033";
+                            shape.style.backgroundColor = "#f0f0f0"; // Light gray promise (legible)
                         }
                     }
                 }

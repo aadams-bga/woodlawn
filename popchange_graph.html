@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Population Change in Woodlawn</title>
+    <script src="https://d3js.org/d3.v7.min.js" defer></script>
+    <style>
+        #pop-graph-container {
+            font-family: "Halyard Text", "halyard-text", Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            background-color: #ffffff; 
+            color: #333333; 
+            padding-bottom: 20px;
+        }
+
+        .iap-logo {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 150px;
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #pop-graph-container h2,
+        #pop-graph-container p,
+        #charts-grid,
+        .graph-footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        #pop-graph-container h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: #333;
+            line-height: 1.2;
+        }
+
+        #pop-graph-container p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        #charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .chart-item {
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .axis-label {
+            font-size: 10px;
+            fill: #999;
+        }
+
+        .line {
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+        }
+
+        .baseline {
+            stroke: #333;
+            stroke-width: 1;
+            stroke-dasharray: 2, 2;
+        }
+
+        .grid-line {
+            stroke: #eee;
+            stroke-width: 1;
+        }
+
+        .graph-footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 500px) {
+            #charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="pop-graph-container">
+    <img src="https://raw.githubusercontent.com/aadams-bga/images/bffe8cc967881aeed4fbdee8328f4b2e056159b9/iaplogo.svg" class="iap-logo" alt="IAP Logo">
+
+    <h2>Woodlawn’s Black population is declining as other groups move in</h2>
+    <p>
+        Since the Obama Presidential Center was announced, Woodlawn has seen a significant decrease in its Black population, while the number of White, Hispanic, and Asian residents has grown. Values represent percentage point changes relative to 2015.
+    </p>
+
+    <div id="charts-grid"></div>
+
+    <div class="graph-footer">
+        Source: U.S. Census Bureau, American Community Survey 5-Year Estimates. <br>
+        &copy; 2026 Illinois Answers Project
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const categories = ["Black", "White", "Hispanic", "Asian", "Other"];
+        const colors = {
+            "Black": "#d32f2f",
+            "White": "#2e7d32",
+            "Hispanic": "#1976d2",
+            "Asian": "#fbc02d",
+            "Other": "#7b1fa2"
+        };
+
+        const margin = {top: 20, right: 10, bottom: 30, left: 30};
+        const width = 220 - margin.left - margin.right;
+        const height = 180 - margin.top - margin.bottom;
+
+        const parseData = d => {
+            return {
+                year: +d.Year,
+                White: +d.White,
+                Black: +d.Black,
+                Asian: +d.Asian,
+                Hispanic: +d.Hispanic,
+                Other: +d.Other
+            };
+        };
+
+        d3.csv("popchange.csv", parseData).then(data => {
+            // Filter out the duplicate 2024 entry if it exists
+            const filteredData = [];
+            const yearsSeen = new Set();
+            data.forEach(d => {
+                if (!yearsSeen.has(d.year)) {
+                    filteredData.push(d);
+                    yearsSeen.add(d.year);
+                }
+            });
+
+            // Global Scales
+            const x = d3.scaleLinear()
+                .domain(d3.extent(filteredData, d => d.year))
+                .range([0, width]);
+
+            const y = d3.scaleLinear()
+                .domain([-10, 4]) // Consistent Y-axis across all charts
+                .range([height, 0]);
+
+            const line = d3.line()
+                .x(d => x(d.year))
+                .y(d => y(d.val))
+                .curve(d3.curveMonotoneX);
+
+            const grid = d3.select("#charts-grid");
+
+            categories.forEach(cat => {
+                const container = grid.append("div").attr("class", "chart-item");
+                container.append("div").attr("class", "chart-title").text(cat);
+
+                const svg = container.append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                // Add zero baseline
+                svg.append("line")
+                    .attr("class", "baseline")
+                    .attr("x1", 0)
+                    .attr("x2", width)
+                    .attr("y1", y(0))
+                    .attr("y2", y(0));
+
+                // Add Y Axis
+                svg.append("g")
+                    .attr("class", "axis")
+                    .call(d3.axisLeft(y).ticks(5).tickFormat(d => d + (d === 0 ? "" : "%")))
+                    .selectAll("text")
+                    .attr("class", "axis-label");
+
+                // Add X Axis
+                svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x).ticks(3).tickFormat(d3.format("d")))
+                    .selectAll("text")
+                    .attr("class", "axis-label");
+
+                const catData = filteredData.map(d => ({year: d.year, val: d[cat]}));
+
+                svg.append("path")
+                    .datum(catData)
+                    .attr("class", "line")
+                    .attr("d", line)
+                    .attr("stroke", colors[cat]);
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

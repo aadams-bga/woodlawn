@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Price Trends in Woodlawn</title>
+    <script src="https://d3js.org/d3.v7.min.js" defer></script>
+    <style>
+        #prices-graph-container {
+            font-family: "Halyard Text", "halyard-text", Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            background-color: #ffffff; 
+            color: #333333; 
+            padding-bottom: 20px;
+        }
+
+        .iap-logo {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 150px;
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #prices-graph-container h2,
+        #prices-graph-container p,
+        #prices-d3-wrapper,
+        .graph-footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        #prices-graph-container h2 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            color: #333;
+            line-height: 1.2;
+        }
+
+        #prices-graph-container p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        #prices-d3-wrapper {
+            min-height: 400px; 
+            display: block;
+        }
+
+        #prices-graph-container .grid line {
+            stroke: #ccc;
+            stroke-opacity: 0.5;
+            stroke-dasharray: 3, 3;
+        }
+        
+        #prices-graph-container .grid path {
+            stroke-width: 0;
+        }
+
+        .graph-footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="prices-graph-container">
+    <img src="https://raw.githubusercontent.com/aadams-bga/images/bffe8cc967881aeed4fbdee8328f4b2e056159b9/iaplogo.svg" class="iap-logo" alt="IAP Logo">
+
+    <h2>Median house prices in Woodlawn outpaced the citywide average</h2>
+    <p>
+       Since 2016, home values in East Woodlawn have risen sharply, mirroring the surge in development following the announcement of the Obama Presidential Center.
+    </p>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #ef4444;"></div>
+            <span>East Woodlawn</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #3b82f6;"></div>
+            <span>West Woodlawn</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background-color: #9ca3af;"></div>
+            <span>Chicago</span>
+        </div>
+    </div>
+    
+    <div id="prices-d3-wrapper"></div>
+
+    <div class="graph-footer">
+        Graph: Andrew Adams, Illinois Answers Project • Source: Analysis of City of Chicago data
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        const data = [
+            { year: 2009, "East Woodlawn": 226900, "West Woodlawn": 100200, "Chicago": 210000 },
+            { year: 2010, "East Woodlawn": 194150, "West Woodlawn": 82150, "Chicago": 193400 },
+            { year: 2011, "East Woodlawn": 167750, "West Woodlawn": 57750, "Chicago": 173500 },
+            { year: 2012, "East Woodlawn": 120350, "West Woodlawn": 34600, "Chicago": 152800 },
+            { year: 2013, "East Woodlawn": 119750, "West Woodlawn": 25000, "Chicago": 144200 },
+            { year: 2014, "East Woodlawn": 132600, "West Woodlawn": 22100, "Chicago": 149600 },
+            { year: 2015, "East Woodlawn": 143150, "West Woodlawn": 20850, "Chicago": 159200 },
+            { year: 2016, "East Woodlawn": 137250, "West Woodlawn": 22450, "Chicago": 172200 },
+            { year: 2017, "East Woodlawn": 163350, "West Woodlawn": 26500, "Chicago": 187800 },
+            { year: 2018, "East Woodlawn": 183250, "West Woodlawn": 30800, "Chicago": 200200 },
+            { year: 2019, "East Woodlawn": 201050, "West Woodlawn": 41600, "Chicago": 210800 },
+            { year: 2020, "East Woodlawn": 234050, "West Woodlawn": 56300, "Chicago": 226600 },
+            { year: 2021, "East Woodlawn": 267850, "West Woodlawn": 71400, "Chicago": 244200 },
+            { year: 2022, "East Woodlawn": 328550, "West Woodlawn": 92600, "Chicago": 259800 },
+            { year: 2023, "East Woodlawn": 349150, "West Woodlawn": 101600, "Chicago": 272400 },
+            { year: 2024, "East Woodlawn": 427100, "West Woodlawn": 113300, "Chicago": 288600 },
+            { year: 2025, "East Woodlawn": 450100, "West Woodlawn": 134900, "Chicago": 298800 }
+        ];
+
+        const categories = ["East Woodlawn", "West Woodlawn", "Chicago"];
+        const colors = { "East Woodlawn": "#ef4444", "West Woodlawn": "#3b82f6", "Chicago": "#9ca3af" };
+
+        const margin = { top: 20, right: 30, bottom: 40, left: 60 };
+        const container = document.getElementById("prices-d3-wrapper");
+        const containerWidth = container.getBoundingClientRect().width || 800;
+        const width = containerWidth - margin.left - margin.right;
+        const height = 400 - margin.top - margin.bottom;
+
+        const svg = d3.select("#prices-d3-wrapper")
+            .append("svg")
+            .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+            .attr("preserveAspectRatio", "xMidYMid meet")
+            .style("width", "100%")
+            .style("height", "auto")
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const x = d3.scaleLinear()
+            .domain(d3.extent(data, d => d.year))
+            .range([0, width]);
+
+        const y = d3.scaleLinear()
+            .domain([0, 500000])
+            .range([height, 0]);
+
+        // Gridlines
+        svg.append("g")
+            .attr("class", "grid")
+            .call(d3.axisLeft(y)
+                .ticks(5)
+                .tickSize(-width)
+                .tickFormat("")
+            )
+            .select(".domain").remove();
+
+        // X Axis
+        svg.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x).tickFormat(d3.format("d")).tickPadding(10))
+            .style("font-size", "12px")
+            .style("color", "#555")
+            .select(".domain").remove();
+
+        // Y Axis
+        svg.append("g")
+            .call(d3.axisLeft(y)
+                .ticks(5)
+                .tickFormat(d => "$" + d3.format("~s")(d))
+                .tickSize(0)
+                .tickPadding(10))
+            .style("font-size", "12px")
+            .style("color", "#555")
+            .select(".domain").remove();
+
+        // Y Axis Title
+        svg.append("text")
+            .attr("x", -margin.left + 5)
+            .attr("y", -10)
+            .attr("text-anchor", "start")
+            .style("font-size", "12px")
+            .style("font-weight", "500")
+            .style("fill", "#666")
+            .text("Median sales price (5-yr rolling avg)");
+
+        // Obama Center Vertical Line
+        const obamaYear = 2016;
+        const obamaX = x(obamaYear);
+        
+        const obamaGroup = svg.append("g")
+            .attr("class", "annotation")
+            .attr("opacity", 0);
+
+        obamaGroup.append("line")
+            .attr("x1", obamaX)
+            .attr("y1", 0)
+            .attr("x2", obamaX)
+            .attr("y2", height)
+            .attr("stroke", "#666")
+            .attr("stroke-width", 1)
+            .attr("stroke-dasharray", "4,4");
+
+        obamaGroup.append("text")
+            .attr("x", obamaX - 5)
+            .attr("y", 20)
+            .attr("font-size", "12px")
+            .attr("font-weight", "bold")
+            .attr("fill", "#333")
+            .attr("text-anchor", "end")
+            .text("Obama Center announced");
+
+        // Line Generator
+        const lineGenerator = d3.line()
+            .x(d => x(d.year))
+            .y(d => y(d.value))
+            .curve(d3.curveMonotoneX);
+
+        // Draw lines with animation
+        categories.forEach((category) => {
+            const categoryData = data.map(d => ({ year: d.year, value: d[category] }));
+
+            const path = svg.append("path")
+                .datum(categoryData)
+                .attr("fill", "none")
+                .attr("stroke", colors[category])
+                .attr("stroke-width", 3)
+                .attr("d", lineGenerator);
+
+            const totalLength = path.node().getTotalLength();
+
+            path
+                .attr("stroke-dasharray", totalLength + " " + totalLength)
+                .attr("stroke-dashoffset", totalLength)
+                .transition()
+                .duration(2000)
+                .ease(d3.easeExpOut)
+                .attr("stroke-dashoffset", 0);
+        });
+
+        // Fade in annotation
+        obamaGroup.transition()
+            .delay(200)
+            .duration(1000)
+            .attr("opacity", 1);
+    });
+</script>
+
+</body>
+</html>

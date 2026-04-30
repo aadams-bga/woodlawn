@@ -122,7 +122,7 @@
             <span>New construction permits</span>
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background-color: #a855f7;"></div>
+            <div class="legend-color" style="background-color: #ff8600;"></div>
             <span>Demolition permits</span>
         </div>
     </div>
@@ -130,7 +130,7 @@
     <div id="permits-d3-wrapper"></div>
 
     <div class="graph-footer">
-        Graph: Andrew Adams, Illinois Answers Project • Source: City of Chicago Data Portal
+        Graph: Andrew Adams, Illinois Answers Project • Source: Chicago Department of Buildings (2008-2025)
     </div>
 </div>
 
@@ -155,12 +155,11 @@
             { year: 2022, "New construction": 49, "Wrecking": 3 },
             { year: 2023, "New construction": 39, "Wrecking": 3 },
             { year: 2024, "New construction": 38, "Wrecking": 3 },
-            { year: 2025, "New construction": 47, "Wrecking": 3 },
-            { year: 2026, "New construction": 4, "Wrecking": 0 }
+            { year: 2025, "New construction": 47, "Wrecking": 3 }
         ];
 
         const categories = ["New construction", "Wrecking"];
-        const colors = { "New construction": "#3b82f6", "Wrecking": "#a855f7" };
+        const colors = { "New construction": "#3b82f6", "Wrecking": "#ff8600" };
 
         const margin = { top: 20, right: 30, bottom: 40, left: 40 };
         const container = document.getElementById("permits-d3-wrapper");
@@ -323,13 +322,13 @@
         const annotations = [
             {
                 year: 2010,
-                value: 35, // Move much higher to avoid lines
+                value: 37.5, // Move much higher to avoid lines
                 text: "For five years, more buildings were being demolished than being built.",
                 align: "start",
                 maxWidth: 160
             },
             {
-                year: 2025,
+                year: 2024.5,
                 value: 27, // Move lower in the right-hand gap
                 text: "The boom in new construction follows the 2016 announcement of the Obama Center.",
                 align: "end",

@@ -50,27 +50,29 @@
 
         #charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
             margin-top: 20px;
         }
 
         .chart-item {
             border-top: 1px solid #eee;
             padding-top: 10px;
+            min-width: 0;
         }
 
         .chart-title {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             color: #444;
+            text-align: center;
         }
 
         .axis-label {
-            font-size: 10px;
+            font-size: 9px;
             fill: #999;
         }
 
@@ -86,11 +88,6 @@
             stroke-dasharray: 2, 2;
         }
 
-        .grid-line {
-            stroke: #eee;
-            stroke-width: 1;
-        }
-
         .graph-footer {
             margin-top: 30px;
             padding-top: 10px;
@@ -100,9 +97,18 @@
             line-height: 1.4;
         }
 
-        @media (max-width: 500px) {
+        @media (max-width: 700px) {
             #charts-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .chart-title {
+                text-align: left;
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            .axis-label {
+                font-size: 10px;
             }
         }
     </style>
@@ -135,9 +141,8 @@
             "Other": "#7b1fa2"
         };
 
-        const margin = {top: 20, right: 10, bottom: 30, left: 30};
-        const width = 220 - margin.left - margin.right;
-        const height = 180 - margin.top - margin.bottom;
+        const margin = {top: 10, right: 5, bottom: 25, left: 25};
+        const height = 120 - margin.top - margin.bottom;
 
         const parseData = d => {
             return {
@@ -151,7 +156,6 @@
         };
 
         d3.csv("popchange.csv", parseData).then(data => {
-            // Filter out the duplicate 2024 entry if it exists
             const filteredData = [];
             const yearsSeen = new Set();
             data.forEach(d => {
@@ -161,63 +165,69 @@
                 }
             });
 
-            // Global Scales
-            const x = d3.scaleLinear()
-                .domain(d3.extent(filteredData, d => d.year))
-                .range([0, width]);
-
-            const y = d3.scaleLinear()
-                .domain([-10, 4]) // Consistent Y-axis across all charts
-                .range([height, 0]);
-
-            const line = d3.line()
-                .x(d => x(d.year))
-                .y(d => y(d.val))
-                .curve(d3.curveMonotoneX);
-
             const grid = d3.select("#charts-grid");
+            
+            function render() {
+                grid.selectAll("*").remove();
+                const containerWidth = document.querySelector("#charts-grid").clientWidth;
+                const isMobile = window.innerWidth <= 700;
+                const chartWidth = isMobile ? (containerWidth - margin.left - margin.right) : (containerWidth / 5 - margin.left - margin.right - 10);
 
-            categories.forEach(cat => {
-                const container = grid.append("div").attr("class", "chart-item");
-                container.append("div").attr("class", "chart-title").text(cat);
+                const x = d3.scaleLinear()
+                    .domain(d3.extent(filteredData, d => d.year))
+                    .range([0, chartWidth]);
 
-                const svg = container.append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform", `translate(${margin.left},${margin.top})`);
+                const y = d3.scaleLinear()
+                    .domain([-10, 4])
+                    .range([height, 0]);
 
-                // Add zero baseline
-                svg.append("line")
-                    .attr("class", "baseline")
-                    .attr("x1", 0)
-                    .attr("x2", width)
-                    .attr("y1", y(0))
-                    .attr("y2", y(0));
+                const line = d3.line()
+                    .x(d => x(d.year))
+                    .y(d => y(d.val))
+                    .curve(d3.curveMonotoneX);
 
-                // Add Y Axis
-                svg.append("g")
-                    .attr("class", "axis")
-                    .call(d3.axisLeft(y).ticks(5).tickFormat(d => d + (d === 0 ? "" : "%")))
-                    .selectAll("text")
-                    .attr("class", "axis-label");
+                categories.forEach(cat => {
+                    const container = grid.append("div").attr("class", "chart-item");
+                    container.append("div").attr("class", "chart-title").text(cat);
 
-                // Add X Axis
-                svg.append("g")
-                    .attr("class", "axis")
-                    .attr("transform", `translate(0,${height})`)
-                    .call(d3.axisBottom(x).ticks(3).tickFormat(d3.format("d")))
-                    .selectAll("text")
-                    .attr("class", "axis-label");
+                    const svg = container.append("svg")
+                        .attr("width", chartWidth + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                        .append("g")
+                        .attr("transform", `translate(${margin.left},${margin.top})`);
 
-                const catData = filteredData.map(d => ({year: d.year, val: d[cat]}));
+                    svg.append("line")
+                        .attr("class", "baseline")
+                        .attr("x1", 0)
+                        .attr("x2", chartWidth)
+                        .attr("y1", y(0))
+                        .attr("y2", y(0));
 
-                svg.append("path")
-                    .datum(catData)
-                    .attr("class", "line")
-                    .attr("d", line)
-                    .attr("stroke", colors[cat]);
-            });
+                    svg.append("g")
+                        .attr("class", "axis")
+                        .call(d3.axisLeft(y).ticks(3).tickFormat(d => d + (d === 0 ? "" : "%")))
+                        .selectAll("text")
+                        .attr("class", "axis-label");
+
+                    svg.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", `translate(0,${height})`)
+                        .call(d3.axisBottom(x).ticks(2).tickFormat(d3.format("d")))
+                        .selectAll("text")
+                        .attr("class", "axis-label");
+
+                    const catData = filteredData.map(d => ({year: d.year, val: d[cat]}));
+
+                    svg.append("path")
+                        .datum(catData)
+                        .attr("class", "line")
+                        .attr("d", line)
+                        .attr("stroke", colors[cat]);
+                });
+            }
+
+            render();
+            window.addEventListener("resize", render);
         });
     });
 </script>

@@ -1,0 +1,338 @@
+<!-- GSAP & ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<style>
+    #promises-outcomes-root {
+        --navy: #000033;
+        --yellow: #FFD700;
+        --white: #ffffff;
+        background-color: var(--white);
+        font-family: "Halyard Text", "halyard-text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: var(--navy);
+        position: relative;
+    }
+
+    .program-section {
+        height: 200vh; /* Extra height for scroll-bound animation */
+        position: relative;
+        border-bottom: 1px solid #eee;
+    }
+
+    .sticky-container {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    /* Left side: Program Title */
+    .program-title-box {
+        flex: 1;
+        padding-left: 5%;
+        z-index: 5;
+    }
+
+    .program-title {
+        font-size: clamp(24px, 4vw, 42px);
+        font-weight: 800;
+        text-transform: uppercase;
+        line-height: 1.1;
+        max-width: 400px;
+    }
+
+    /* Center: The Morphing Shape */
+    .morph-wrapper {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 300px;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .morph-shape {
+        width: 100%;
+        height: 100%;
+        background-color: var(--navy);
+        transition: background-color 0.5s ease;
+        /* Default: Solid Square */
+        clip-path: inset(0% 0% 0% 0%);
+    }
+
+    /* Right side: Content (Promise & Outcome) */
+    .content-box {
+        flex: 1;
+        padding-right: 5%;
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        z-index: 5;
+    }
+
+    .promise-text, .outcome-text {
+        position: absolute;
+        width: 80%;
+    }
+
+    .label {
+        font-size: 12px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .promise-text { color: var(--navy); }
+    .outcome-text { 
+        opacity: 0; 
+        color: var(--navy);
+    }
+
+    .outcome-text .label { color: #d32f2f; }
+
+    .main-copy {
+        font-size: clamp(18px, 2vw, 24px);
+        line-height: 1.4;
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 800px) {
+        .sticky-container {
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 40px;
+        }
+        .program-title-box {
+            padding: 0 20px;
+            text-align: center;
+            flex: none;
+        }
+        .morph-wrapper {
+            top: 40%;
+            width: 200px;
+            height: 200px;
+            opacity: 0.2; /* Fade behind text on mobile */
+        }
+        .content-box {
+            padding: 0 20px;
+            text-align: center;
+            align-items: center;
+            flex: 1;
+        }
+        .promise-text, .outcome-text {
+            width: 90%;
+        }
+    }
+</style>
+
+<div id="promises-outcomes-root">
+
+    <!-- Program 1 -->
+    <section class="program-section" id="program-1">
+        <div class="sticky-container">
+            <div class="program-title-box">
+                <div class="program-title">Vacant Lot Set Aside</div>
+            </div>
+            
+            <div class="morph-wrapper">
+                <div class="morph-shape"></div>
+            </div>
+
+            <div class="content-box">
+                <div class="promise-text">
+                    <span class="label">The Promise</span>
+                    <p class="main-copy">52 city-owned vacant lots reserved for new housing with units affordable to residents making $17,500 per year.</p>
+                </div>
+                <div class="outcome-text">
+                    <span class="label">The Outcome</span>
+                    <p class="main-copy">The city sold two lots. One housing development is completed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program 2 -->
+    <section class="program-section" id="program-2">
+        <div class="sticky-container">
+            <div class="program-title-box">
+                <div class="program-title">PEAR Program</div>
+            </div>
+            <div class="morph-wrapper">
+                <div class="morph-shape"></div>
+            </div>
+            <div class="content-box">
+                <div class="promise-text">
+                    <span class="label">The Promise</span>
+                    <p class="main-copy">$1.5M in grants to buy or refinance multifamily properties in exchange for 30-year affordability agreements.</p>
+                </div>
+                <div class="outcome-text">
+                    <span class="label">The Outcome</span>
+                    <p class="main-copy">No applications were received. The $1.5M in funding was "reallocated," according to DOH.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program 3 -->
+    <section class="program-section" id="program-3">
+        <div class="sticky-container">
+            <div class="program-title-box">
+                <div class="program-title">Renew Woodlawn</div>
+            </div>
+            <div class="morph-wrapper">
+                <div class="morph-shape"></div>
+            </div>
+            <div class="content-box">
+                <div class="promise-text">
+                    <span class="label">The Promise</span>
+                    <p class="main-copy">$500,000 granted to nonproftit developer POAH to acquire and redevelop residential units in Woodlawn.</p>
+                </div>
+                <div class="outcome-text">
+                    <span class="label">The Outcome</span>
+                    <p class="main-copy">To date, POAH has not used the money.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program 4 -->
+    <section class="program-section" id="program-4">
+        <div class="sticky-container">
+            <div class="program-title-box">
+                <div class="program-title">Woodlawn Loan Fund</div>
+            </div>
+            <div class="morph-wrapper">
+                <div class="morph-shape"></div>
+            </div>
+            <div class="content-box">
+                <div class="promise-text">
+                    <span class="label">The Promise</span>
+                    <p class="main-copy">$7 million dollars loan fund for local developrs to bring vacant lots and apartment buidlings back online.</p>
+                </div>
+                <div class="outcome-text">
+                    <span class="label">The Outcome</span>
+                    <p class="main-copy">40 units were financed. No single family home projects got off the ground.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program 5 -->
+    <section class="program-section" id="program-5">
+        <div class="sticky-container">
+            <div class="program-title-box">
+                <div class="program-title">Home Improvement Grants</div>
+            </div>
+            <div class="morph-wrapper">
+                <div class="morph-shape"></div>
+            </div>
+            <div class="content-box">
+                <div class="promise-text">
+                    <span class="label">The Promise</span>
+                    <p class="main-copy">$1 million dollars granted to longterm homeowners in Woodlawn who need help fixing up their properties.</p>
+                </div>
+                <div class="outcome-text">
+                    <span class="label">The Outcome</span>
+                    <p class="main-copy">36 homeowners received grants up to $20,000.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program 6 -->
+    <section class="program-section" id="program-6">
+        <div class="sticky-container">
+            <div class="program-title-box">
+                <div class="program-title">Hiring Requirements</div>
+            </div>
+            <div class="morph-wrapper">
+                <div class="morph-shape"></div>
+            </div>
+            <div class="content-box">
+                <div class="promise-text">
+                    <span class="label">The Promise</span>
+                    <p class="main-copy">City required developers on city-owned land to submit plans for local hiring, outreach, and training.</p>
+                </div>
+                <div class="outcome-text">
+                    <span class="label">The Outcome</span>
+                    <p class="main-copy">One developer submitted a plan for 19 jobs and hired three people.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program 7 -->
+    <section class="program-section" id="program-7">
+        <div class="sticky-container">
+            <div class="program-title-box">
+                <div class="program-title">Right of First Refusal</div>
+            </div>
+            <div class="morph-wrapper">
+                <div class="morph-shape"></div>
+            </div>
+            <div class="content-box">
+                <div class="promise-text">
+                    <span class="label">The Promise</span>
+                    <p class="main-copy">Give Woodlawn renters the first chance to match or beat outside offers on their buildings before a sale goes through.</p>
+                </div>
+                <div class="outcome-text">
+                    <span class="label">The Outcome</span>
+                    <p class="main-copy">To date, no tenants have exercised their right of first refusal.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    (function() {
+        gsap.registerPlugin(ScrollTrigger);
+
+        const sections = document.querySelectorAll(".program-section");
+
+        sections.forEach((section, index) => {
+            const shape = section.querySelector(".morph-shape");
+            const promise = section.querySelector(".promise-text");
+            const outcome = section.querySelector(".outcome-text");
+            const wrapper = section.querySelector(".morph-wrapper");
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 1,
+                    onUpdate: (self) => {
+                        // Dynamically change shape based on scroll
+                        // 0% scroll = Solid Square
+                        // 100% scroll = Hollow/Small Triangle (Broken)
+                        const p = self.progress;
+                        const clipValue = p * 40; // Shrink effect
+                        shape.style.clipPath = `inset(${clipValue}% ${clipValue}% ${clipValue}% ${clipValue}% round ${p * 50}%)`;
+                        
+                        if (p > 0.5) {
+                            shape.style.backgroundColor = "#FFD700"; // Morph color to yellow on failure
+                        } else {
+                            shape.style.backgroundColor = "#000033";
+                        }
+                    }
+                }
+            });
+
+            // Text transitions
+            tl.to(promise, { opacity: 0, y: -20, duration: 0.4 }, 0)
+              .to(outcome, { opacity: 1, y: 0, duration: 0.4 }, 0.5);
+        });
+    })();
+</script>

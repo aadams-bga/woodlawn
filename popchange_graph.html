@@ -48,27 +48,32 @@
             margin-bottom: 20px;
         }
 
+        /* Forced Horizontal Row for ALL screens */
         #charts-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
+            gap: 8px;
             margin-top: 20px;
+            width: 100%;
         }
 
         .chart-item {
             border-top: 1px solid #eee;
             padding-top: 10px;
-            min-width: 0;
+            min-width: 0; /* Important for grid shrinkage */
         }
 
         .chart-title {
             font-size: 11px;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0px;
             margin-bottom: 5px;
             color: #444;
             text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .axis-label {
@@ -78,13 +83,13 @@
 
         .line {
             fill: none;
-            stroke-width: 2.5;
+            stroke-width: 2.2;
             stroke-linecap: round;
         }
 
         .baseline {
             stroke: #333;
-            stroke-width: 1;
+            stroke-width: 0.8;
             stroke-dasharray: 2, 2;
         }
 
@@ -97,19 +102,14 @@
             line-height: 1.4;
         }
 
-        @media (max-width: 700px) {
-            #charts-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            .chart-title {
-                text-align: left;
-                font-size: 14px;
-                margin-bottom: 10px;
-            }
-            .axis-label {
-                font-size: 10px;
-            }
+        /* Ultra-compact tweaks for small mobile */
+        @media (max-width: 500px) {
+            #pop-graph-container h2 { font-size: 18px; }
+            #pop-graph-container p { font-size: 12px; }
+            #charts-grid { gap: 4px; }
+            .chart-title { font-size: 9px; }
+            .axis-label { font-size: 7.5px; }
+            .line { stroke-width: 1.8; }
         }
     </style>
 </head>
@@ -141,8 +141,9 @@
             "Other": "#7b1fa2"
         };
 
-        const margin = {top: 10, right: 5, bottom: 25, left: 25};
-        const height = 120 - margin.top - margin.bottom;
+        // Tight margins for 5-across layout
+        const margin = {top: 10, right: 2, bottom: 20, left: 24};
+        const height = 90 - margin.top - margin.bottom;
 
         const parseData = d => {
             return {
@@ -170,8 +171,8 @@
             function render() {
                 grid.selectAll("*").remove();
                 const containerWidth = document.querySelector("#charts-grid").clientWidth;
-                const isMobile = window.innerWidth <= 700;
-                const chartWidth = isMobile ? (containerWidth - margin.left - margin.right) : (containerWidth / 5 - margin.left - margin.right - 10);
+                // Force each chart to occupy 1/5th of the available space
+                const chartWidth = (containerWidth / 5) - margin.left - margin.right - 2;
 
                 const x = d3.scaleLinear()
                     .domain(d3.extent(filteredData, d => d.year))
@@ -196,6 +197,7 @@
                         .append("g")
                         .attr("transform", `translate(${margin.left},${margin.top})`);
 
+                    // Add zero baseline
                     svg.append("line")
                         .attr("class", "baseline")
                         .attr("x1", 0)
@@ -203,18 +205,21 @@
                         .attr("y1", y(0))
                         .attr("y2", y(0));
 
+                    // Add Y Axis (Minimal ticks)
                     svg.append("g")
                         .attr("class", "axis")
-                        .call(d3.axisLeft(y).ticks(3).tickFormat(d => d + (d === 0 ? "" : "%")))
+                        .call(d3.axisLeft(y).ticks(2).tickFormat(d => d + (d === 0 ? "" : "%")))
                         .selectAll("text")
                         .attr("class", "axis-label");
 
+                    // Add X Axis (Start/End only)
                     svg.append("g")
                         .attr("class", "axis")
                         .attr("transform", `translate(0,${height})`)
-                        .call(d3.axisBottom(x).ticks(2).tickFormat(d3.format("d")))
+                        .call(d3.axisBottom(x).tickValues([2015, 2024]).tickFormat(d3.format("d")))
                         .selectAll("text")
-                        .attr("class", "axis-label");
+                        .attr("class", "axis-label")
+                        .style("text-anchor", (d, i) => i === 0 ? "start" : "end");
 
                     const catData = filteredData.map(d => ({year: d.year, val: d[cat]}));
 

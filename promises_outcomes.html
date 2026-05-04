@@ -3,6 +3,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
 <style>
+    /* WordPress parent overflow fix — required for position:sticky to work */
+    .entry-content, .site-main, .post-content, #main-content, article, .wp-block-post-content,
+    #page, #wrapper, .site, .site-content, #content, .wp-site-blocks,
+    main, .hentry, .post, .page, [class*="wp-container"] {
+        overflow: visible !important;
+        clip-path: none !important;
+    }
+    html { overflow-x: clip !important; }
+
     #promises-outcomes-root {
         --navy: #000033;
         --yellow: #FFD700;
@@ -12,6 +21,9 @@
         font-family: "Halyard Text", "halyard-text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         color: var(--navy);
         position: relative;
+        /* Break out of WordPress content column */
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
     }
 
     .program-section {
@@ -20,10 +32,13 @@
         border-bottom: 1px solid #eee;
     }
 
+    :root { --header-h: 0px; }
+
     .sticky-container {
         position: sticky;
-        top: 0;
+        top: var(--header-h);
         height: 100vh;
+        height: calc(100dvh - var(--header-h));
         display: flex;
         align-items: center;
         overflow: hidden;
@@ -33,6 +48,7 @@
     .program-title-box {
         flex: 1.5;
         padding-left: 3%;
+        padding-right: 8%;
         z-index: 5;
     }
 
@@ -71,6 +87,7 @@
     .content-box {
         flex: 2;
         padding-right: 5%;
+        padding-left: 8%;
         position: relative;
         height: 100%;
         display: flex;
@@ -108,32 +125,49 @@
 
     /* Mobile Adjustments */
     @media (max-width: 800px) {
+        .program-section {
+            height: 250vh;
+        }
         .sticky-container {
             flex-direction: column;
-            justify-content: flex-start;
-            padding-top: 40px;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
         .program-title-box {
-            padding: 0 20px;
+            position: relative;
+            z-index: 5;
+            padding: 0 24px;
             text-align: center;
             flex: none;
-            width: 90%;
-        }
-        .morph-wrapper {
-            top: 45%;
-            width: 250px;
-            height: 250px;
-            opacity: 0.15; /* Fade behind text on mobile */
-        }
-        .content-box {
-            padding: 0 20px;
-            text-align: center;
-            align-items: center;
-            flex: 1;
             width: 100%;
+            box-sizing: border-box;
+        }
+        /* Morph centered in the viewport as a background element */
+        .morph-wrapper {
+            top: 50%;
+            bottom: auto;
+            transform: translate(-50%, -50%);
+            width: 220px;
+            height: 220px;
+            z-index: 0;
+        }
+        /* Explicit height so absolutely-positioned texts have a real containing block */
+        .content-box {
+            position: relative;
+            z-index: 5;
+            flex: none;
+            width: 90%;
+            height: 200px;
+            padding: 0;
+            text-align: center;
+            overflow: visible;
         }
         .promise-text, .outcome-text {
-            width: 95%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
         }
     }
 </style>
@@ -299,6 +333,30 @@
 </div>
 
 <script>
+    // Detect fixed/sticky header height and write to CSS variable
+    (function() {
+        function getHeaderOffset() {
+            var selectors = ['#wpadminbar', '.site-header', '#masthead', '.header-wrap', 'header'];
+            var maxBottom = 0;
+            for (var i = 0; i < selectors.length; i++) {
+                var el = document.querySelector(selectors[i]);
+                if (el) {
+                    var pos = window.getComputedStyle(el).position;
+                    if (pos === 'fixed' || pos === 'sticky') {
+                        var bottom = el.getBoundingClientRect().bottom;
+                        if (bottom > maxBottom) { maxBottom = bottom; }
+                    }
+                }
+            }
+            return Math.round(maxBottom);
+        }
+        function applyOffset() {
+            document.documentElement.style.setProperty('--header-h', getHeaderOffset() + 'px');
+        }
+        applyOffset();
+        window.addEventListener('resize', applyOffset);
+    })();
+
     (function() {
         gsap.registerPlugin(ScrollTrigger);
 
@@ -342,9 +400,11 @@
                 }
             });
 
-            // Text transitions
-            tl.to(promise, { opacity: 0, y: -20, duration: 0.4 }, 0)
-              .to(outcome, { opacity: 1, y: 0, duration: 0.4 }, 0.5);
+            // Text transitions: pause on promise → quick crossfade → pause on outcome
+            tl.to({}, { duration: 0.35 })
+              .to(promise, { opacity: 0, y: -20, duration: 0.15 })
+              .to(outcome, { opacity: 1, y: 0, duration: 0.15 }, "-=0.05")
+              .to({}, { duration: 0.4 });
         });
     })();
 </script>

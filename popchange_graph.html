@@ -134,11 +134,11 @@
     document.addEventListener("DOMContentLoaded", function() {
         const categories = ["Black", "White", "Hispanic", "Asian", "Other"];
         const colors = {
-            "Black": "#d32f2f",
-            "White": "#2e7d32",
-            "Hispanic": "#1976d2",
-            "Asian": "#fbc02d",
-            "Other": "#7b1fa2"
+            "Black": "#536dcb",
+            "White": "#bf5e5e",
+            "Hispanic": "#caa135",
+            "Asian": "#287d1c",
+            "Other": "#81409d"
         };
 
         // Tight margins for 5-across layout
@@ -172,7 +172,7 @@
                 grid.selectAll("*").remove();
                 const containerWidth = document.querySelector("#charts-grid").clientWidth;
                 // Force each chart to occupy 1/5th of the available space
-                const chartWidth = (containerWidth / 5) - margin.left - margin.right - 2;
+                const chartWidth = Math.max(1, (containerWidth / 5) - margin.left - margin.right - 2);
 
                 const x = d3.scaleLinear()
                     .domain(d3.extent(filteredData, d => d.year))

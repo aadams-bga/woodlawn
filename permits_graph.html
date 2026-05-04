@@ -164,7 +164,7 @@
         const margin = { top: 20, right: 30, bottom: 40, left: 40 };
         const container = document.getElementById("permits-d3-wrapper");
         const containerWidth = container.getBoundingClientRect().width || 800;
-        const width = containerWidth - margin.left - margin.right;
+        const width = Math.max(1, containerWidth - margin.left - margin.right);
         const height = 400 - margin.top - margin.bottom;
 
         const svg = d3.select("#permits-d3-wrapper")

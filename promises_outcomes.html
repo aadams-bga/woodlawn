@@ -140,6 +140,7 @@
             justify-content: center;
             gap: 20px;
             overflow: hidden;
+            padding-bottom: 20vh;
         }
         .program-title-box {
             padding: 0 20px;
@@ -151,13 +152,13 @@
             max-width: 100%;
         }
         .morph-wrapper {
-            position: relative;
-            left: auto;
-            top: auto;
-            transform: none;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
             width: 180px;
             height: 180px;
-            margin: 20px 0;
+            z-index: 0;
         }
         .content-box {
             padding: 0 20px;

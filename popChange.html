@@ -146,91 +146,82 @@
         const margin = {top: 10, right: 2, bottom: 20, left: 24};
         const height = 90 - margin.top - margin.bottom;
 
-        const parseData = d => {
-            return {
-                year: +d.Year,
-                White: +d.White,
-                Black: +d.Black,
-                Asian: +d.Asian,
-                Hispanic: +d.Hispanic,
-                Other: +d.Other
-            };
-        };
+        const filteredData = [
+            { year: 2015, White:  0,           Black:  0,           Asian:  0,            Hispanic: 0,           Other: 0           },
+            { year: 2016, White:  1.076723831,  Black: -1.29967436,  Asian: -0.1085958525, Hispanic: 0.3500236165, Other: 0.2640971973 },
+            { year: 2017, White:  1.910164778,  Black: -2.602278439, Asian:  0.1362241025, Hispanic: 0.4663818732, Other: 0.3174173114 },
+            { year: 2018, White:  1.441535016,  Black: -2.47232516,  Asian:  0.5275320811, Hispanic: 0.6962909802, Other: 0.3431032669 },
+            { year: 2019, White:  1.517707354,  Black: -2.584297232, Asian:  0.3467886302, Hispanic: 0.7370009125, Other: 0.210749243  },
+            { year: 2020, White:  1.631675857,  Black: -3.14043078,  Asian:  0.01662861997,Hispanic: 0.3279051179, Other: 0.2025202194 },
+            { year: 2021, White:  2.87303284,   Black: -5.417222479, Asian:  0.1297054878, Hispanic: 0.07407283164,Other: 1.176905823  },
+            { year: 2022, White:  3.148308195,  Black: -7.719339556, Asian:  0.0958849273, Hispanic: 0.5726072151, Other: 2.750266713  },
+            { year: 2023, White:  3.468508577,  Black: -6.452759089, Asian: -0.1653908455, Hispanic: 0.09718870789,Other: 1.946842373  },
+            { year: 2024, White:  3.065475687,  Black: -9.173343751, Asian:  0.551870869,  Hispanic: 1.542008287,  Other: 2.111783264  },
+        ];
 
-        d3.csv("popchange.csv", parseData).then(data => {
-            const filteredData = [];
-            const yearsSeen = new Set();
-            data.forEach(d => {
-                if (!yearsSeen.has(d.year)) {
-                    filteredData.push(d);
-                    yearsSeen.add(d.year);
-                }
+        const grid = d3.select("#charts-grid");
+
+        function render() {
+            grid.selectAll("*").remove();
+            const containerWidth = document.querySelector("#charts-grid").clientWidth;
+            const chartWidth = Math.max(1, (containerWidth / 5) - margin.left - margin.right - 2);
+
+            const x = d3.scaleLinear()
+                .domain(d3.extent(filteredData, d => d.year))
+                .range([0, chartWidth]);
+
+            const y = d3.scaleLinear()
+                .domain([-10, 4])
+                .range([height, 0]);
+
+            const line = d3.line()
+                .x(d => x(d.year))
+                .y(d => y(d.val))
+                .curve(d3.curveMonotoneX);
+
+            categories.forEach(cat => {
+                const container = grid.append("div").attr("class", "chart-item");
+                container.append("div").attr("class", "chart-title").text(cat);
+
+                const svg = container.append("svg")
+                    .attr("width", chartWidth + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                svg.append("line")
+                    .attr("class", "baseline")
+                    .attr("x1", 0)
+                    .attr("x2", chartWidth)
+                    .attr("y1", y(0))
+                    .attr("y2", y(0));
+
+                svg.append("g")
+                    .attr("class", "axis")
+                    .call(d3.axisLeft(y).ticks(2).tickFormat(d => d + (d === 0 ? "" : "%")))
+                    .selectAll("text")
+                    .attr("class", "axis-label");
+
+                svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x).tickValues([2015, 2024]).tickFormat(d3.format("d")))
+                    .selectAll("text")
+                    .attr("class", "axis-label")
+                    .style("text-anchor", (d, i) => i === 0 ? "start" : "end");
+
+                const catData = filteredData.map(d => ({year: d.year, val: d[cat]}));
+
+                svg.append("path")
+                    .datum(catData)
+                    .attr("class", "line")
+                    .attr("d", line)
+                    .attr("stroke", colors[cat]);
             });
+        }
 
-            const grid = d3.select("#charts-grid");
-            
-            function render() {
-                grid.selectAll("*").remove();
-                const containerWidth = document.querySelector("#charts-grid").clientWidth;
-                const chartWidth = Math.max(1, (containerWidth / 5) - margin.left - margin.right - 2);
-
-                const x = d3.scaleLinear()
-                    .domain(d3.extent(filteredData, d => d.year))
-                    .range([0, chartWidth]);
-
-                const y = d3.scaleLinear()
-                    .domain([-10, 4])
-                    .range([height, 0]);
-
-                const line = d3.line()
-                    .x(d => x(d.year))
-                    .y(d => y(d.val))
-                    .curve(d3.curveMonotoneX);
-
-                categories.forEach(cat => {
-                    const container = grid.append("div").attr("class", "chart-item");
-                    container.append("div").attr("class", "chart-title").text(cat);
-
-                    const svg = container.append("svg")
-                        .attr("width", chartWidth + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
-                        .append("g")
-                        .attr("transform", `translate(${margin.left},${margin.top})`);
-
-                    svg.append("line")
-                        .attr("class", "baseline")
-                        .attr("x1", 0)
-                        .attr("x2", chartWidth)
-                        .attr("y1", y(0))
-                        .attr("y2", y(0));
-
-                    svg.append("g")
-                        .attr("class", "axis")
-                        .call(d3.axisLeft(y).ticks(2).tickFormat(d => d + (d === 0 ? "" : "%")))
-                        .selectAll("text")
-                        .attr("class", "axis-label");
-
-                    svg.append("g")
-                        .attr("class", "axis")
-                        .attr("transform", `translate(0,${height})`)
-                        .call(d3.axisBottom(x).tickValues([2015, 2024]).tickFormat(d3.format("d")))
-                        .selectAll("text")
-                        .attr("class", "axis-label")
-                        .style("text-anchor", (d, i) => i === 0 ? "start" : "end");
-
-                    const catData = filteredData.map(d => ({year: d.year, val: d[cat]}));
-
-                    svg.append("path")
-                        .datum(catData)
-                        .attr("class", "line")
-                        .attr("d", line)
-                        .attr("stroke", colors[cat]);
-                });
-            }
-
-            render();
-            window.addEventListener("resize", render);
-        });
+        render();
+        window.addEventListener("resize", render);
     });
 </script>
 

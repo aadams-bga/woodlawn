@@ -280,7 +280,7 @@
             if (event === 'uchicago') features.uchicago.addTo(map);
             if (event === 'cultural') features.cultural.addTo(map);
             if (event === 'opc') features.opc.addTo(map);
-            if (event === 'data') document.getElementById('overlay-data').classList.add('is-active');
+            if (event === 'data') document.getElementById('overlay-data')?.classList.add('is-active');
             if (event === 'photo') { 
                 features.photo.addTo(map); 
                 document.getElementById('overlay-photo').classList.add('is-active'); 

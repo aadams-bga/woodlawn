@@ -97,24 +97,37 @@
 
     <h2>House prices in Woodlawn have increased more than fourfold in the past decade</h2>
     <p>
-       Since 2016, the year the Obama Presidential Center was announced, home prices in Woodlawn have increased 4.6 times. In West Woodlawn, which has historically been more affordable, the median house sale has increased 8.75 times. 
+       Since 2016, the year the Obama Presidential Center was announced, single family home prices in Woodlawn have increased 4.6 times. In West Woodlawn, which has historically been more affordable, the median house sale has increased 8.75 times. 
     </p>
 
     <div class="legend">
         <div class="legend-item">
-            <div class="legend-color" style="background-color: #439260;"></div>
+            <svg width="28" height="18" style="flex-shrink:0;">
+                <line x1="0" y1="7" x2="28" y2="7" stroke="#439260" stroke-width="2.5"/>
+                <line x1="0" y1="13" x2="28" y2="13" stroke="#439260" stroke-width="1.5" stroke-opacity="0.25"/>
+            </svg>
             <span>East Woodlawn</span>
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background-color: #e4a12a;"></div>
+            <svg width="28" height="18" style="flex-shrink:0;">
+                <line x1="0" y1="7" x2="28" y2="7" stroke="#e4a12a" stroke-width="2.5"/>
+                <line x1="0" y1="13" x2="28" y2="13" stroke="#e4a12a" stroke-width="1.5" stroke-opacity="0.25"/>
+            </svg>
             <span>West Woodlawn</span>
         </div>
         <div class="legend-item">
-            <div class="legend-color" style="background-color: rgb(119, 123, 129);"></div>
+            <svg width="28" height="18" style="flex-shrink:0;">
+                <line x1="0" y1="7" x2="28" y2="7" stroke="rgb(119,123,129)" stroke-width="2.5"/>
+                <line x1="0" y1="13" x2="28" y2="13" stroke="rgb(119,123,129)" stroke-width="1.5" stroke-opacity="0.25"/>
+            </svg>
             <span>Chicago</span>
         </div>
     </div>
     
+    <div style="font-size: 11px; color: #888; margin-bottom: 15px; margin-top: -8px;">
+        Bold: 5-yr rolling average &nbsp;·&nbsp; Faint: annual median sales price
+    </div>
+
     <div id="prices-d3-wrapper"></div>
 
     <div class="graph-footer">
@@ -124,29 +137,53 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        
-        const data = [
+
+        const rawData = [
+            { year: 2005, "East Woodlawn": 271000, "West Woodlawn": 125000, "Chicago": 225000 },
+            { year: 2006, "East Woodlawn": 287500, "West Woodlawn": 138000, "Chicago": 239500 },
+            { year: 2007, "East Woodlawn": 349000, "West Woodlawn": 139500, "Chicago": 240500 },
+            { year: 2008, "East Woodlawn": 150000, "West Woodlawn": 69000,  "Chicago": 198000 },
+            { year: 2009, "East Woodlawn": 77000,  "West Woodlawn": 29500,  "Chicago": 147000 },
+            { year: 2010, "East Woodlawn": 107250, "West Woodlawn": 34750,  "Chicago": 142000 },
+            { year: 2011, "East Woodlawn": 155500, "West Woodlawn": 16000,  "Chicago": 140000 },
+            { year: 2012, "East Woodlawn": 112000, "West Woodlawn": 23750,  "Chicago": 137000 },
+            { year: 2013, "East Woodlawn": 147000, "West Woodlawn": 21000,  "Chicago": 155000 },
+            { year: 2014, "East Woodlawn": 141250, "West Woodlawn": 15000,  "Chicago": 174000 },
+            { year: 2015, "East Woodlawn": 160000, "West Woodlawn": 28500,  "Chicago": 190000 },
+            { year: 2016, "East Woodlawn": 126000, "West Woodlawn": 24000,  "Chicago": 205000 },
+            { year: 2017, "East Woodlawn": 242500, "West Woodlawn": 44000,  "Chicago": 215000 },
+            { year: 2018, "East Woodlawn": 246500, "West Woodlawn": 42500,  "Chicago": 217000 },
+            { year: 2019, "East Woodlawn": 230250, "West Woodlawn": 69000,  "Chicago": 227000 },
+            { year: 2020, "East Woodlawn": 325000, "West Woodlawn": 102000, "Chicago": 269000 },
+            { year: 2021, "East Woodlawn": 295000, "West Woodlawn": 99500,  "Chicago": 293000 },
+            { year: 2022, "East Woodlawn": 546000, "West Woodlawn": 150000, "Chicago": 293000 },
+            { year: 2023, "East Woodlawn": 349500, "West Woodlawn": 87500,  "Chicago": 280000 },
+            { year: 2024, "East Woodlawn": 620000, "West Woodlawn": 127500, "Chicago": 308000 },
+            { year: 2025, "East Woodlawn": 440000, "West Woodlawn": 210000, "Chicago": 320000 }
+        ];
+
+        const rollingData = [
             { year: 2009, "East Woodlawn": 226900, "West Woodlawn": 100200, "Chicago": 210000 },
-            { year: 2010, "East Woodlawn": 194150, "West Woodlawn": 82150, "Chicago": 193400 },
-            { year: 2011, "East Woodlawn": 167750, "West Woodlawn": 57750, "Chicago": 173500 },
-            { year: 2012, "East Woodlawn": 120350, "West Woodlawn": 34600, "Chicago": 152800 },
-            { year: 2013, "East Woodlawn": 119750, "West Woodlawn": 25000, "Chicago": 144200 },
-            { year: 2014, "East Woodlawn": 132600, "West Woodlawn": 22100, "Chicago": 149600 },
-            { year: 2015, "East Woodlawn": 143150, "West Woodlawn": 20850, "Chicago": 159200 },
-            { year: 2016, "East Woodlawn": 137250, "West Woodlawn": 22450, "Chicago": 172200 },
-            { year: 2017, "East Woodlawn": 163350, "West Woodlawn": 26500, "Chicago": 187800 },
-            { year: 2018, "East Woodlawn": 183250, "West Woodlawn": 30800, "Chicago": 200200 },
-            { year: 2019, "East Woodlawn": 201050, "West Woodlawn": 41600, "Chicago": 210800 },
-            { year: 2020, "East Woodlawn": 234050, "West Woodlawn": 56300, "Chicago": 226600 },
-            { year: 2021, "East Woodlawn": 267850, "West Woodlawn": 71400, "Chicago": 244200 },
-            { year: 2022, "East Woodlawn": 328550, "West Woodlawn": 92600, "Chicago": 259800 },
+            { year: 2010, "East Woodlawn": 194150, "West Woodlawn": 82150,  "Chicago": 193400 },
+            { year: 2011, "East Woodlawn": 167750, "West Woodlawn": 57750,  "Chicago": 173500 },
+            { year: 2012, "East Woodlawn": 120350, "West Woodlawn": 34600,  "Chicago": 152800 },
+            { year: 2013, "East Woodlawn": 119750, "West Woodlawn": 25000,  "Chicago": 144200 },
+            { year: 2014, "East Woodlawn": 132600, "West Woodlawn": 22100,  "Chicago": 149600 },
+            { year: 2015, "East Woodlawn": 143150, "West Woodlawn": 20850,  "Chicago": 159200 },
+            { year: 2016, "East Woodlawn": 137250, "West Woodlawn": 22450,  "Chicago": 172200 },
+            { year: 2017, "East Woodlawn": 163350, "West Woodlawn": 26500,  "Chicago": 187800 },
+            { year: 2018, "East Woodlawn": 183250, "West Woodlawn": 30800,  "Chicago": 200200 },
+            { year: 2019, "East Woodlawn": 201050, "West Woodlawn": 41600,  "Chicago": 210800 },
+            { year: 2020, "East Woodlawn": 234050, "West Woodlawn": 56300,  "Chicago": 226600 },
+            { year: 2021, "East Woodlawn": 267850, "West Woodlawn": 71400,  "Chicago": 244200 },
+            { year: 2022, "East Woodlawn": 328550, "West Woodlawn": 92600,  "Chicago": 259800 },
             { year: 2023, "East Woodlawn": 349150, "West Woodlawn": 101600, "Chicago": 272400 },
             { year: 2024, "East Woodlawn": 427100, "West Woodlawn": 113300, "Chicago": 288600 },
             { year: 2025, "East Woodlawn": 450100, "West Woodlawn": 134900, "Chicago": 298800 }
         ];
 
         const categories = ["East Woodlawn", "West Woodlawn", "Chicago"];
-        const colors = { "East Woodlawn": "#439260", "West Woodlawn": "#e4a12a", "Chicago": "rgba(200,200,200,0.8)" };
+        const colors = { "East Woodlawn": "#439260", "West Woodlawn": "#e4a12a", "Chicago": "rgb(119,123,129)" };
 
         const margin = { top: 20, right: 30, bottom: 40, left: 60 };
         const container = document.getElementById("prices-d3-wrapper");
@@ -164,11 +201,11 @@
             .attr("transform", `translate(${margin.left},${margin.top})`);
 
         const x = d3.scaleLinear()
-            .domain(d3.extent(data, d => d.year))
+            .domain([2009,d3.max(rawData, d => d.year)])
             .range([0, width]);
 
         const y = d3.scaleLinear()
-            .domain([0, 500000])
+            .domain([0, 650000])
             .range([height, 0]);
 
         // Gridlines
@@ -200,51 +237,58 @@
             .style("color", "#555")
             .select(".domain").remove();
 
-        // Y Axis Title
-        svg.append("text")
-            .attr("x", -margin.left + 5)
-            .attr("y", -10)
-            .attr("text-anchor", "start")
-            .style("font-size", "12px")
-            .style("font-weight", "500")
-            .style("fill", "#666")
-            .text("Median sales price (5-yr rolling avg)");
+
 
         // Obama Center Vertical Line
         const obamaYear = 2016;
         const obamaX = x(obamaYear);
-        
+
         const obamaGroup = svg.append("g")
             .attr("class", "annotation")
             .attr("opacity", 0);
 
         obamaGroup.append("line")
-            .attr("x1", obamaX)
-            .attr("y1", 0)
-            .attr("x2", obamaX)
-            .attr("y2", height)
+            .attr("x1", obamaX).attr("y1", 0)
+            .attr("x2", obamaX).attr("y2", height)
             .attr("stroke", "#666")
             .attr("stroke-width", 1)
             .attr("stroke-dasharray", "4,4");
 
-        obamaGroup.append("text")
-            .attr("x", obamaX - 5)
-            .attr("y", 20)
+        const obamaText = obamaGroup.append("text")
+            .attr("x", obamaX - 5).attr("y", 20)
             .attr("font-size", "12px")
             .attr("font-weight", "bold")
             .attr("fill", "#333")
-            .attr("text-anchor", "end")
-            .text("Obama Center announced");
+            .attr("text-anchor", "end");
 
-        // Line Generator
+        obamaText.append("tspan")
+            .attr("x", obamaX - 5).attr("dy", 0)
+            .text("Obama Center");
+
+        obamaText.append("tspan")
+            .attr("x", obamaX - 5).attr("dy", "1.2em")
+            .text("announced");
+
         const lineGenerator = d3.line()
             .x(d => x(d.year))
             .y(d => y(d.value))
             .curve(d3.curveMonotoneX);
 
-        // Draw lines with animation
-        categories.forEach((category) => {
-            const categoryData = data.map(d => ({ year: d.year, value: d[category] }));
+        // Raw data — faint background lines (no animation)
+        categories.forEach(category => {
+            const categoryData = rawData.filter(d => d.year >= 2009).map(d => ({ year: d.year, value: d[category] }));
+            svg.append("path")
+                .datum(categoryData)
+                .attr("fill", "none")
+                .attr("stroke", colors[category])
+                .attr("stroke-width", 1.5)
+                .attr("stroke-opacity", 0.25)
+                .attr("d", lineGenerator);
+        });
+
+        // Rolling averages — bold animated lines on top
+        categories.forEach(category => {
+            const categoryData = rollingData.map(d => ({ year: d.year, value: d[category] }));
 
             const path = svg.append("path")
                 .datum(categoryData)
@@ -254,7 +298,6 @@
                 .attr("d", lineGenerator);
 
             const totalLength = path.node().getTotalLength();
-
             path
                 .attr("stroke-dasharray", totalLength + " " + totalLength)
                 .attr("stroke-dashoffset", totalLength)

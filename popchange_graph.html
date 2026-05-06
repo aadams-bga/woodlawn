@@ -48,7 +48,6 @@
             margin-bottom: 20px;
         }
 
-        /* Forced Horizontal Row for ALL screens */
         #charts-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -60,7 +59,7 @@
         .chart-item {
             border-top: 1px solid #eee;
             padding-top: 10px;
-            min-width: 0; /* Important for grid shrinkage */
+            min-width: 0; 
         }
 
         .chart-title {
@@ -106,7 +105,6 @@
             line-height: 1.4;
         }
 
-        /* Ultra-compact tweaks for small mobile */
         @media (max-width: 500px) {
             #pop-graph-container h2 { font-size: 18px; }
             #pop-graph-container p { font-size: 12px; }
@@ -145,7 +143,6 @@
             "Other": "#81409d"
         };
 
-        // Tight margins for 5-across layout
         const margin = {top: 10, right: 2, bottom: 20, left: 24};
         const height = 90 - margin.top - margin.bottom;
 
@@ -175,7 +172,6 @@
             function render() {
                 grid.selectAll("*").remove();
                 const containerWidth = document.querySelector("#charts-grid").clientWidth;
-                // Force each chart to occupy 1/5th of the available space
                 const chartWidth = Math.max(1, (containerWidth / 5) - margin.left - margin.right - 2);
 
                 const x = d3.scaleLinear()
@@ -201,7 +197,6 @@
                         .append("g")
                         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-                    // Add zero baseline
                     svg.append("line")
                         .attr("class", "baseline")
                         .attr("x1", 0)
@@ -209,14 +204,12 @@
                         .attr("y1", y(0))
                         .attr("y2", y(0));
 
-                    // Add Y Axis (Minimal ticks)
                     svg.append("g")
                         .attr("class", "axis")
                         .call(d3.axisLeft(y).ticks(2).tickFormat(d => d + (d === 0 ? "" : "%")))
                         .selectAll("text")
                         .attr("class", "axis-label");
 
-                    // Add X Axis (Start/End only)
                     svg.append("g")
                         .attr("class", "axis")
                         .attr("transform", `translate(0,${height})`)

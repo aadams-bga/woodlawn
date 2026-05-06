@@ -184,7 +184,6 @@
             .domain([0, d3.max(data, d => Math.max(d["New construction"], d["Wrecking"]))]).nice()
             .range([height, 0]);
 
-        // Gridlines
         svg.append("g")
             .attr("class", "grid")
             .call(d3.axisLeft(y)
@@ -194,7 +193,6 @@
             )
             .select(".domain").remove();
 
-        // X Axis
         svg.append("g")
             .attr("transform", `translate(0,${height})`)
             .call(d3.axisBottom(x).tickFormat(d3.format("d")).tickPadding(10))
@@ -202,14 +200,12 @@
             .style("color", "#555")
             .select(".domain").remove();
 
-        // Y Axis
         svg.append("g")
             .call(d3.axisLeft(y).ticks(5).tickSize(0).tickPadding(10))
             .style("font-size", "12px")
             .style("color", "#555")
             .select(".domain").remove();
 
-        // Y Axis Title
         svg.append("text")
             .attr("x", -margin.left + 5)
             .attr("y", -10)
@@ -219,14 +215,10 @@
             .style("fill", "#666")
             .text("Permits issued");
 
-        // Lines
         const lineGenerator = d3.line()
             .x(d => x(d.year))
             .y(d => y(d.value))
             .curve(d3.curveMonotoneX);
-
-        // Define areas for shading between lines
-        // We use two clip paths to determine which line is "on top"
         
         svg.append("clipPath")
             .attr("id", "clip-above")
@@ -250,7 +242,6 @@
                 .curve(d3.curveMonotoneX)
             );
 
-        // Shade area with "New construction" color when it is ABOVE "Wrecking"
         svg.append("path")
             .datum(data)
             .attr("fill", colors["New construction"])
@@ -263,8 +254,6 @@
                 .curve(d3.curveMonotoneX)
             );
 
-        // Shade area with "Wrecking" color when it is ABOVE "New construction"
-        // First we need a clip path for Wrecking being above New Construction
         svg.append("clipPath")
             .attr("id", "clip-above-new")
             .append("path")
@@ -288,7 +277,6 @@
                 .curve(d3.curveMonotoneX)
             );
 
-        // Draw the actual lines on top of the shading with animation
         categories.forEach((category, i) => {
             const categoryData = data.map(d => ({ year: d.year, value: d[category] }));
 
@@ -310,7 +298,6 @@
                 .attr("stroke-dashoffset", 0);
         });
 
-        // Fade in shading after lines start drawing
         svg.selectAll("path[fill-opacity]")
             .attr("opacity", 0)
             .transition()
@@ -318,18 +305,17 @@
             .duration(1500)
             .attr("opacity", 1);
 
-        // Annotations
         const annotations = [
             {
                 year: 2010,
-                value: 37.5, // Move much higher to avoid lines
+                value: 37.5, 
                 text: "For five years, more buildings were being demolished than being built.",
                 align: "start",
                 maxWidth: 160
             },
             {
                 year: 2024.5,
-                value: 27, // Move lower in the right-hand gap
+                value: 27, 
                 text: "The boom in new construction follows the 2016 announcement of the Obama Center.",
                 align: "end",
                 maxWidth: 150
@@ -344,7 +330,6 @@
             const xPos = x(ann.year);
             const yPos = y(ann.value);
 
-            // Text
             const textElement = annotationGroup.append("text")
                 .attr("x", xPos)
                 .attr("y", yPos)
@@ -353,7 +338,6 @@
                 .attr("text-anchor", ann.align)
                 .style("font-weight", "bold");
 
-            // Wrap text
             const words = ann.text.split(/\s+/);
             let line = [];
             const lineHeight = 1.2; 
@@ -380,7 +364,6 @@
             .duration(1000)
             .attr("opacity", 1);
 
-        // Add a transparent overlay for tooltips since dots are gone
         const overlay = svg.append("rect")
             .attr("width", width)
             .attr("height", height)

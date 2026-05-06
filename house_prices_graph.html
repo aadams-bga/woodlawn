@@ -208,7 +208,6 @@
             .domain([0, 650000])
             .range([height, 0]);
 
-        // Gridlines
         svg.append("g")
             .attr("class", "grid")
             .call(d3.axisLeft(y)
@@ -218,7 +217,6 @@
             )
             .select(".domain").remove();
 
-        // X Axis
         svg.append("g")
             .attr("transform", `translate(0,${height})`)
             .call(d3.axisBottom(x).tickFormat(d3.format("d")).tickPadding(10))
@@ -226,7 +224,6 @@
             .style("color", "#555")
             .select(".domain").remove();
 
-        // Y Axis
         svg.append("g")
             .call(d3.axisLeft(y)
                 .ticks(5)
@@ -237,9 +234,6 @@
             .style("color", "#555")
             .select(".domain").remove();
 
-
-
-        // Obama Center Vertical Line
         const obamaYear = 2016;
         const obamaX = x(obamaYear);
 
@@ -274,7 +268,6 @@
             .y(d => y(d.value))
             .curve(d3.curveMonotoneX);
 
-        // Raw data — faint background lines (no animation)
         categories.forEach(category => {
             const categoryData = rawData.filter(d => d.year >= 2009).map(d => ({ year: d.year, value: d[category] }));
             svg.append("path")
@@ -286,7 +279,6 @@
                 .attr("d", lineGenerator);
         });
 
-        // Rolling averages — bold animated lines on top
         categories.forEach(category => {
             const categoryData = rollingData.map(d => ({ year: d.year, value: d[category] }));
 
@@ -307,7 +299,6 @@
                 .attr("stroke-dashoffset", 0);
         });
 
-        // Fade in annotation
         obamaGroup.transition()
             .delay(200)
             .duration(1000)

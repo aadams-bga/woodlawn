@@ -1,21 +1,16 @@
-<!-- WOODLAWN STORY MAP v3.1 - WP ULTIMATE STABLE -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/scrollama"></script>
 
 <style>
-    /* 1. WP PARENT OVERRIDES - Critical for sticky positioning */
-    /* overflow:hidden on any ancestor breaks position:sticky — cast a wide net */
     .entry-content, .site-main, .post-content, #main-content, article, .wp-block-post-content,
     #page, #wrapper, .site, .site-content, #content, .wp-site-blocks,
     main, .hentry, .post, .page, [class*="wp-container"] {
         overflow: visible !important;
         clip-path: none !important;
     }
-    /* clip (not hidden) on the root so horizontal overflow doesn't leak */
     html { overflow-x: clip !important; }
 
-    /* 2. FULL-WIDTH BREAKOUT WRAPPER */
     #woodlawn-scrolly-v3 {
         position: relative;
         width: 100vw;
@@ -28,14 +23,13 @@
 
     #woodlawn-scrolly-v3 * { box-sizing: border-box; }
 
-    /* 3. STICKY MAP LAYER */
     .map-sticky-box {
         position: -webkit-sticky;
         position: sticky;
         top: 0;
         width: 100%;
         height: 100vh;
-        height: 100dvh; /* dvh excludes mobile browser chrome, preventing height mismatch */
+        height: 100dvh; 
         z-index: 1;
         background-color: #000;
         overflow: hidden;
@@ -46,7 +40,6 @@
         height: 100%;
     }
 
-    /* 4. OVERLAYS (Inside sticky container) */
     .overlay-screen {
         position: absolute;
         top: 0;
@@ -87,13 +80,12 @@
 
     .photo-frame { max-width: 85%; max-height: 75%; border: 2px solid #fff; box-shadow: 0 15px 40px rgba(0,0,0,0.8); }
 
-    /* 5. SCROLLING CONTENT */
     .scroll-layer {
         position: relative;
         z-index: 20;
         width: 100%;
         margin-top: -100vh;
-        margin-top: -100dvh; /* match map height on mobile */
+        margin-top: -100dvh; 
         pointer-events: none;
     }
 
@@ -106,7 +98,6 @@
         pointer-events: all;
     }
 
-    /* Scoped under ID to beat WP theme specificity */
     #woodlawn-scrolly-v3 .step-card {
         opacity: 1 !important;
         background: rgba(12, 12, 12, 0.78) !important;
@@ -121,7 +112,6 @@
     #woodlawn-scrolly-v3 .step-card h3 { margin: 0 0 1rem 0; color: #fff !important; font-size: 24px; font-weight: 900; text-transform: uppercase; line-height: 1; letter-spacing: 0.04em; }
     #woodlawn-scrolly-v3 .step-card p { line-height: 1.5; font-size: 1.25rem; margin-bottom: 0; font-weight: 400; color: #e0e0e0 !important; }
 
-    /* Mini Bar inside card */
     #woodlawn-scrolly-v3 .mini-chart { margin-top: 20px; background: rgba(255,255,255,0.06); padding: 15px; border: 1px solid rgba(255,255,255,0.12) !important; border-radius: 0 !important; }
     #woodlawn-scrolly-v3 .mc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     #woodlawn-scrolly-v3 .mc-label { font-size: 11px; font-weight: bold; color: rgba(255,255,255,0.5); width: 40px; }
@@ -131,7 +121,6 @@
 
     #woodlawn-scrolly-v3 .card-img { width: 100%; height: auto; margin-bottom: 15px; border-radius: 0 !important; }
 
-    /* 6. MOBILE FIXES */
     @media (max-width: 600px) {
         #woodlawn-scrolly-v3 .step-card { padding: 0.9rem 1.25rem 1.25rem !important; }
         #woodlawn-scrolly-v3 .step-card h3 { font-size: 20px; }
@@ -142,7 +131,6 @@
     .leaflet-attribution-flag { display: none !important; }
     .leaflet-control-attribution { background: rgba(0,0,0,0.8) !important; color: #fff !important; }
 
-    /* Editorial leader-line markers */
     .lm { display:flex; align-items:center; width:220px; height:28px; overflow:visible; }
     .lm-dot { width:7px; height:7px; min-width:7px; background:#fff; border-radius:50%; box-shadow:0 0 0 1px rgba(0,0,0,0.5), 0 1px 5px rgba(0,0,0,0.8); flex-shrink:0; }
     .lm-line { width:18px; min-width:18px; height:1px; background:rgba(255,255,255,0.55); flex-shrink:0; }
@@ -151,7 +139,6 @@
 
 <div id="woodlawn-scrolly-v3">
     
-    <!-- THE STICKY MAP -->
     <div class="map-sticky-box">
         <div id="map-mount"></div>
         <div id="overlay-photo" class="overlay-screen">
@@ -159,9 +146,8 @@
         </div>
     </div>
 
-    <!-- THE SCROLLING STORY -->
     <div class="scroll-layer">
-        <div style="height: 60vh;"></div> <!-- Push content down to see map start -->
+        <div style="height: 60vh;"></div> 
         
         <div class="step" data-lat="41.7803" data-lng="-87.5908" data-zoom="14" data-zoom-mobile="13" data-event="uchicago">
             <div class="step-card">
@@ -200,20 +186,18 @@
             </div>
         </div>
 
-        <div style="height: 100vh;"></div> <!-- Final space -->
+        <div style="height: 100vh;"></div> 
     </div>
 
 </div>
 
 <script>
     (function init() {
-        // Retry until Leaflet + Scrollama are both available (WP may defer CDN scripts)
         if (typeof L === 'undefined') { return setTimeout(init, 100); }
         if (typeof scrollama === 'undefined') { return setTimeout(init, 100); }
 
         const root = document.getElementById('woodlawn-scrolly-v3');
         
-        // 1. INITIALIZE MAP
         const map = L.map('map-mount', {
             scrollWheelZoom: false, zoomControl: false, dragging: false, touchZoom: false, doubleClickZoom: false, attributionControl: true
         }).setView([41.7803, -87.5908], 14);
@@ -222,7 +206,6 @@
             maxZoom: 19, attribution: 'Tiles &copy; Esri'
         }).addTo(map);
 
-        // 2. DATA
         const woodlawnGeoJSON = {"type":"Polygon","coordinates":[[[-87.5771523075371,41.7861541266004],[-87.5760473797377,41.7836087708755],[-87.5731098887586,41.7821417962824],[-87.5705047744347,41.7813781523897],[-87.5696873075262,41.7813044669716],[-87.5684027166698,41.7816193040751],[-87.5676481318312,41.7846269252913],[-87.5675403339971,41.7846068302947],[-87.5683128851414,41.7815456189342],[-87.5712863087319,41.7808489552347],[-87.5730829393001,41.7802594646543],[-87.5729571751603,41.7798307408284],[-87.5741160018768,41.7795359915354],[-87.5747448225757,41.7791206606869],[-87.5751041486893,41.7784574655293],[-87.5753107612047,41.7774124168173],[-87.5751400813007,41.7768965852142],[-87.5746100752831,41.776159675727],[-87.5746999068115,41.7759921951172],[-87.5750861823837,41.7759386012298],[-87.5750502497723,41.7757912178083],[-87.5742237997109,41.7755567434852],[-87.5734781980251,41.7755165478009],[-87.573370400191,41.7753825620045],[-87.5732176865927,41.7755969391443],[-87.5720049609591,41.7758314133204],[-87.5717803821381,41.776668814095],[-87.5723193713086,41.7773454259344],[-87.5724541186012,41.7774191159017],[-87.5726517479637,41.7773454259344],[-87.573370400191,41.778316786887],[-87.573370400191,41.7789129942539],[-87.5732176865927,41.7792010475127],[-87.5726697142694,41.7793350253318],[-87.5722475060859,41.7792345419937],[-87.5718252979023,41.7785847459399],[-87.5699029031943,41.7770037713433],[-87.5691932341199,41.7766956107392],[-87.568564413421,41.776159675727],[-87.5668306649226,41.7739756942437],[-87.5664533725033,41.7738015084693],[-87.566812698617,41.7735670268722],[-87.6057726324892,41.7731516573675],[-87.6055929694324,41.7658755553302],[-87.615456471252,41.7729774693553],[-87.6157618984486,41.7857053475338],[-87.5866025843261,41.7861474284284],[-87.5866025843261,41.7864019584699],[-87.5863690223522,41.7864086566152],[-87.5855515554437,41.7862746935754],[-87.5851742630243,41.7858594063735],[-87.5771523075371,41.7861541266004]]]};
         L.geoJSON(woodlawnGeoJSON, {
             style: { color: '#fff', weight: 4, dashArray: '6, 9', fillColor: '#fff', fillOpacity: 0.2, interactive: false }
@@ -265,14 +248,12 @@
             photo: L.polygon([[41.7828, -87.6012], [41.7828, -87.6006], [41.7822, -87.6006], [41.7822, -87.6012]], yellowStyle)
         };
 
-        // 3. SCROLLAMA
         const scroller = scrollama();
         
         scroller.setup({ step: '.step', offset: 0.6 })
         .onStepEnter((res) => {
             const el = res.element;
 
-            // Re-calc map size for WP
             map.invalidateSize();
 
             const lat = parseFloat(el.dataset.lat);
@@ -293,7 +274,6 @@
                 }
             }
 
-            // UI Updates
             Object.values(features).forEach(f => f.remove());
             document.querySelectorAll('.overlay-screen').forEach(s => s.classList.remove('is-active'));
 
@@ -308,13 +288,11 @@
         })
         .onStepExit((_res) => {});
 
-        // 4. LAYOUT PROTECTIONS
         window.addEventListener("resize", () => {
             scroller.resize();
             map.invalidateSize();
         });
         
-        // Staggered size checks to catch slow WP theme loads
         setTimeout(() => map.invalidateSize(), 200);
         setTimeout(() => map.invalidateSize(), 2000);
     })();

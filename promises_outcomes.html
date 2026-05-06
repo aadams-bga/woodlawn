@@ -1,9 +1,7 @@
-<!-- GSAP & ScrollTrigger -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
 <style>
-    /* WordPress parent overflow fix — required for position:sticky to work */
     .entry-content, .site-main, .post-content, #main-content, article, .wp-block-post-content,
     #page, #wrapper, .site, .site-content, #content, .wp-site-blocks,
     main, .hentry, .post, .page, [class*="wp-container"] {
@@ -27,7 +25,7 @@
     }
 
     .program-section {
-        height: 200vh; /* Extra height for scroll-bound animation */
+        height: 200vh; 
         position: relative;
         border-bottom: 1px solid #eee;
     }
@@ -44,10 +42,10 @@
         justify-content: center;
     }
 
-    /* Left side: Program Title */
+
     .program-title-box {
         flex: 1;
-        padding-right: 10px; /* Aggressively tight (75px radius + 10px buffer) */
+        padding-right: 10px; 
         text-align: right;
         z-index: 5;
     }
@@ -61,7 +59,6 @@
         max-width: 550px;
     }
 
-    /* Center: The Morphing Shape */
     .morph-wrapper {
         position: absolute;
         left: 50%;
@@ -84,12 +81,11 @@
         clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
     }
 
-    /* Right side: Content (Promise & Outcome) */
     .content-box {
         flex: 1.2;
-        padding-left: 10px; /* Aggressively tight */
+        padding-left: 10px; 
         position: relative;
-        height: 300px; /* Defined height for absolute children */
+        height: 300px; 
         display: flex;
         align-items: center;
         z-index: 5;
@@ -115,7 +111,7 @@
     .outcome-text { 
         opacity: 0; 
         color: var(--navy);
-        transform: translateY(20px); /* Start state for animation */
+        transform: translateY(20px); 
     }
 
     .outcome-text .label { color: #d32f2f; }
@@ -179,7 +175,6 @@
 
 <div id="promises-outcomes-root">
 
-    <!-- Program 1 -->
     <section class="program-section" id="program-1">
         <div class="sticky-container">
             <div class="program-title-box">
@@ -193,21 +188,20 @@
             <div class="content-box">
                 <div class="promise-text">
                     <span class="label">The Promise</span>
-                    <p class="main-copy">52 city-owned vacant lots reserved for new housing with units affordable to residents making $17,500 per year.</p>
+                    <p class="main-copy">52 city-owned vacant lots reserved for new affordable housing</p>
                 </div>
                 <div class="outcome-text">
                     <span class="label">The Outcome</span>
-                    <p class="main-copy">The city sold two lots. One housing development is completed.</p>
+                    <p class="main-copy">Only one development, a 58-unit apartment building, was completed in five years.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Program 2 -->
     <section class="program-section" id="program-2">
         <div class="sticky-container">
             <div class="program-title-box">
-                <div class="program-title">Preservation of Existing Affordable Rental Program</div>
+                <div class="program-title">Program to preserve existing affordable rentals</div>
             </div>
             <div class="morph-wrapper">
                 <div class="morph-shape"></div>
@@ -215,21 +209,20 @@
             <div class="content-box">
                 <div class="promise-text">
                     <span class="label">The Promise</span>
-                    <p class="main-copy">$1.5M in grants to buy or refinance multifamily properties in exchange for 30-year affordability agreements.</p>
+                    <p class="main-copy">$1.5 million in city grants to buy or refinance multifamily properties in exchange for 30-year affordability agreements</p>
                 </div>
                 <div class="outcome-text">
                     <span class="label">The Outcome</span>
-                    <p class="main-copy">No applications were received. The $1.5M in funding was "reallocated," according to DOH.</p>
+                    <p class="main-copy">No applications were received; the city says the money was reallocated.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Program 3 -->
     <section class="program-section" id="program-3">
         <div class="sticky-container">
             <div class="program-title-box">
-                <div class="program-title">Renew Woodlawn</div>
+                <div class="program-title">Renew Woodlawn Program</div>
             </div>
             <div class="morph-wrapper">
                 <div class="morph-shape"></div>
@@ -237,17 +230,16 @@
             <div class="content-box">
                 <div class="promise-text">
                     <span class="label">The Promise</span>
-                    <p class="main-copy">$500,000 granted to nonprofit developer POAH to acquire and redevelop residential units in Woodlawn.</p>
+                    <p class="main-copy">$500,000 grant to a nonprofit developer to buy and redevelop residential units in Woodlawn</p>
                 </div>
                 <div class="outcome-text">
                     <span class="label">The Outcome</span>
-                    <p class="main-copy">To date, POAH has not used the money.</p>
+                    <p class="main-copy">Money was never used</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Program 4 -->
     <section class="program-section" id="program-4">
         <div class="sticky-container">
             <div class="program-title-box">
@@ -259,17 +251,16 @@
             <div class="content-box">
                 <div class="promise-text">
                     <span class="label">The Promise</span>
-                    <p class="main-copy">$8 million dollars budgeted in loans to local developrs to bring vacant lots and apartment buildings back online.</p>
+                    <p class="main-copy">$8 million fund earmarked for loans to local developers to build or rehab residential units</p>
                 </div>
                 <div class="outcome-text">
                     <span class="label">The Outcome</span>
-                    <p class="main-copy">40 units were financed by 2025. Another 18 were announced in 2026. No single family home projects got off the ground. </p>
+                    <p class="main-copy">40 were financed by 2025. Another 18 units are getting rehabbed or improved this year.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Program 5 -->
     <section class="program-section" id="program-5">
         <div class="sticky-container">
             <div class="program-title-box">
@@ -281,21 +272,20 @@
             <div class="content-box">
                 <div class="promise-text">
                     <span class="label">The Promise</span>
-                    <p class="main-copy">$1 million granted to long-term homeowners in Woodlawn who need help fixing up their properties.</p>
+                    <p class="main-copy">$1 million earmarked for long-term Woodlawn homeowners who needed help fixing up their properties</p>
                 </div>
                 <div class="outcome-text">
                     <span class="label">The Outcome</span>
-                    <p class="main-copy">36 homeowners received grants up to $20,000.</p>
+                    <p class="main-copy">36 homeowners received grants of up to $20,000</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Program 6 -->
     <section class="program-section" id="program-6">
         <div class="sticky-container">
             <div class="program-title-box">
-                <div class="program-title">Hiring Requirements</div>
+                <div class="program-title">Local Jobs</div>
             </div>
             <div class="morph-wrapper">
                 <div class="morph-shape"></div>
@@ -303,17 +293,16 @@
             <div class="content-box">
                 <div class="promise-text">
                     <span class="label">The Promise</span>
-                    <p class="main-copy">City required developers on city-owned land to submit plans for local hiring, outreach, and training.</p>
+                    <p class="main-copy">City required developers on city-owned land to submit plans for local hiring, outreach and training.</p>
                 </div>
                 <div class="outcome-text">
                     <span class="label">The Outcome</span>
-                    <p class="main-copy">One developer hired three people.</p>
+                    <p class="main-copy">One development resulted in three jobs for local residents.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Program 7 -->
     <section class="program-section" id="program-7">
         <div class="sticky-container">
             <div class="program-title-box">
@@ -325,11 +314,11 @@
             <div class="content-box">
                 <div class="promise-text">
                     <span class="label">The Promise</span>
-                    <p class="main-copy">Give Woodlawn renters the first chance to match or beat outside offers on their buildings before a sale goes through.</p>
+                    <p class="main-copy">Under the plan, Woodlawn renters would get first change to match or beat any outside offers on their buildings before they were sold.</p>
                 </div>
                 <div class="outcome-text">
                     <span class="label">The Outcome</span>
-                    <p class="main-copy">To date, no tenants have exercised their right of first refusal.</p>
+                    <p class="main-copy">The city never enforced the measure; no developer filed the required notice.</p>
                 </div>
             </div>
         </div>
@@ -338,7 +327,6 @@
 </div>
 
 <script>
-    // Detect fixed/sticky header height and write to CSS variable
     (function() {
         function getHeaderOffset() {
             var selectors = ['#wpadminbar', '.site-header', '#masthead', '.header-wrap', 'header'];
@@ -397,15 +385,14 @@
                         shape.style.clipPath = `polygon(${p1}, ${p2}, ${p3}, ${p4})`;
                         
                         if (p > 0.5) {
-                            shape.style.backgroundColor = "#FFD700"; // Yellow failure
+                            shape.style.backgroundColor = "#FFD700"; 
                         } else {
-                            shape.style.backgroundColor = "#f0f0f0"; // Light gray promise (legible)
+                            shape.style.backgroundColor = "#f0f0f0"; 
                         }
                     }
                 }
             });
 
-            // Text transitions: pause on promise → quick crossfade → pause on outcome
             tl.to({}, { duration: 0.35 })
               .to(promise, { opacity: 0, y: -20, duration: 0.15 })
               .to(outcome, { opacity: 1, y: 0, duration: 0.15 }, "-=0.05")

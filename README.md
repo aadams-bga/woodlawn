@@ -1,6 +1,6 @@
 These are a collection of graphics and interactive elements for a story reported by Sidnee King Padea and Bingui Huang, with graphics by Andrew Adams published by the Illinois Answers Project. The code is available to use as part of our republishing process. If you have questions, please contact aadams@bettergov.org. 
 
-### How to embed the graphics 
+## How to embed the graphics 
 The republish button on the Illinois Answers website may break the scroling graphics. Please copy the code in this repository. You may need to replace portions of broken code if using the republish button from the website. 
 - [Promises/Outcomes scroll](./promisesOutcomes.html)
 - [Woodlawn map scroll](woodlawnMap.html)
